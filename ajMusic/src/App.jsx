@@ -1,5 +1,8 @@
 import React, { useState, useRef } from "react";
 import axios from "axios";
+import { motion } from "framer-motion";
+import styles from "./App.module.css";
+import RecognizedMusic from "./RecognizedMusic/RecognizedMusic";
 
 const App = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -25,7 +28,7 @@ const App = () => {
       // Automatically stop recording after 5 seconds
       setTimeout(() => {
         stopRecordingAndSend();
-      }, 5000); // Adjust the duration as needed
+      }, 5000);
     } catch (err) {
       setError("Microphone access is required for this feature.");
       console.error(err);
@@ -43,7 +46,7 @@ const App = () => {
           const formData = new FormData();
           formData.append("audio", audioBlob);
 
-          const response = await axios.post("http://localhost:5000/identify", formData, {
+          const response = await axios.post("http://localhost:5001/identify", formData, {
             headers: {
               "Content-Type": "multipart/form-data",
             },
@@ -63,19 +66,38 @@ const App = () => {
   };
 
   return (
-    <div>
-      <h1>Live Music Recognition</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <div>
-        <button onClick={startRecording} disabled={isRecording}>
+    <div className={styles.container}>
+      <motion.h1
+        className={styles.title}
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        Live Music Recognition
+      </motion.h1>
+
+      {error && <p className={styles.error}>{error}</p>}
+
+      <motion.div
+        className={styles.recordButtonContainer}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+      >
+        <button onClick={startRecording} className={styles.recordButton} disabled={isRecording}>
           {isRecording ? "Recording..." : "Start Recording"}
         </button>
-      </div>
+      </motion.div>
+
       {recognizedMusic && (
-        <div>
+        <motion.div
+          className={styles.result}
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <h3>Recognized Music:</h3>
-          <pre>{JSON.stringify(recognizedMusic, null, 2)}</pre>
-        </div>
+          <RecognizedMusic data={recognizedMusic}/>
+        </motion.div>
       )}
     </div>
   );

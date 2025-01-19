@@ -1,0 +1,71 @@
+.container {
+    font-family: "Arial", sans-serif;
+    margin: 20px;
+    padding: 20px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f3ec78, #af4261);
+    color: #fff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .songDetails {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .similarSongs {
+    margin-top: 30px;
+  }
+  
+  .similarSongs ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .songCard {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: transform 0.2s ease;
+  }
+  
+  .songCard:hover {
+    transform: scale(1.02);
+  }
+  
+  .coverImage {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+  }
+  
+  .songInfo {
+    flex: 1;
+  }
+  
+  .link {
+    color: #ffcc00;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .link:hover {
+    text-decoration: underline;
+  }
+  
+  .audioPreview {
+    margin-top: 10px;
+  }
+  

@@ -8,7 +8,7 @@ const cors = require("cors");
 
 // Initialize Express app
 const app = express();
-const port = 5000;
+const port = 5001;
 app.use(cors());
 
 // Setup file upload using multer
