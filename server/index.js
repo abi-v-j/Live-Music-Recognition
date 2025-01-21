@@ -15,8 +15,11 @@ const app = express();
 const port = process.env.PORT || 5001;
 
 
-app.use(cors());
-
+app.use(cors({
+  origin: 'https://live-music-recognition.vercel.app',
+  methods: ['GET', 'POST'], // Specify allowed HTTP methods
+  credentials: true, // Allow cookies if needed
+}));
 // Setup file upload using multer
 const upload = multer({ dest: 'uploads/' });
 
