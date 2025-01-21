@@ -21,7 +21,7 @@ app.use(cors({
   credentials: true, // Allow cookies if needed
 }));
 // Setup file upload using multer
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: '/tmp/uploads/' });
 
 // ACRCloud credentials
 const defaultOptions = {
