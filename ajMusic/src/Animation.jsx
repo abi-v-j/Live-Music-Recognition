@@ -109,7 +109,7 @@ const Animation = () => {
           const formData = new FormData();
           formData.append('audio', audioBlob);
 
-          const response = await axios.post('http://localhost:5001/identify', formData, {
+          const response = await axios.post('https://live-music-recognition-4bl1.vercel.app/', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
