@@ -16,7 +16,7 @@ const port = process.env.PORT || 5001;
 
 
 app.use(cors({
-  origin: 'https://live-music-recognition.vercel.app',
+  origin: 'https://live-music-recognition.vercel.app/',
 }));
 
 // Setup file upload using multer
