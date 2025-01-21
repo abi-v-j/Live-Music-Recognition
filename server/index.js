@@ -14,7 +14,7 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5001;
 
-const allowedOrigins = ['https://live-music-recognition.vercel.app/', 'http://localhost:5173/'];
+const allowedOrigins = ['https://live-music-recognition.vercel.app', 'http://localhost:5173'];
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -23,8 +23,11 @@ app.use(cors({
     } else {
       callback(new Error('Not allowed by CORS'));
     }
-  }
+  },
+  methods: ['GET', 'POST'],
+  credentials: true,
 }));
+
 // Setup file upload using multer
 const upload = multer({ dest: 'uploads/' });
 
