@@ -59,7 +59,7 @@ const MusicFound = ({ music }) => {
       <ul className='player-list'>
         {
           similar_songs && similar_songs.map((song,key) => (
-            <li>
+            <li key={key}>
               <img
                 className='list-cover'
                 src={song.cover_image}
