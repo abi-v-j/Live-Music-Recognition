@@ -5,10 +5,12 @@ const request = require('request');
 const multer = require('multer');
 const SpotifyWebApi = require('spotify-web-api-node');
 const cors = require("cors");
+require('dotenv').config();
+
 
 // Initialize Express app
 const app = express();
-const port = 5001;
+const port = process.env.PORT || 5001;
 app.use(cors());
 
 // Setup file upload using multer
@@ -16,19 +18,19 @@ const upload = multer({ dest: 'uploads/' });
 
 // ACRCloud credentials
 const defaultOptions = {
-  host: 'identify-ap-southeast-1.acrcloud.com',
+  host: process.env.ACR_HOST,
   endpoint: '/v1/identify',
   signature_version: '1',
   data_type: 'audio',
   secure: true,
-  access_key: 'f325f02bbcf39f2416ffb61cddb03ade',
-  access_secret: 'rPsjcVPuse64YlebxMhkXs5GUJaUsywa7nvAsk4V',
+  access_key: process.env.ACR_ACCESS_KEY,
+  access_secret: process.env.ACR_ACCESS_SECRET,
 };
 
 // Spotify API credentials
 const spotifyApi = new SpotifyWebApi({
-  clientId: 'b112bd3214ce4ec591b8d88029d21b57',
-  clientSecret: '7c23b523e5614b848d30d31fbd294aca',
+  clientId: process.env.SPOTIFY_CLIENT_ID,
+  clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
 });
 
 // Enhanced Spotify authentication
