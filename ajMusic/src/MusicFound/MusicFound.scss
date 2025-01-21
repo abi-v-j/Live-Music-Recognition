@@ -5,6 +5,9 @@ $color-purple: #26107b;
 $color-gray: #8d8d8d;
 $color-gray-light: #cdcdcd;
 $color-white: #fff;
+*{
+  margin: 0;
+}
 
 .music-player {
   align-self: center;
@@ -184,6 +187,9 @@ $color-white: #fff;
   padding: 24px;
   background: $color-white;
   list-style: none;
+  overflow-y: scroll;
+  height:150px;
+
 
   li {
     display: flex;

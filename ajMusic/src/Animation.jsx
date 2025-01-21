@@ -1,31 +1,139 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 import MusicFound from './MusicFound/MusicFound';
-
 const Animation = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recognizedMusic, setRecognizedMusic] = useState(null);
+  const [error, setError] = useState(null);
 
-  const handleClick = () => {
-    setIsAnimating(prev => !prev);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const streamRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
+  const handleClick = async () => {
+    if (isRecording) return;
+
+    try {
+      setError(null);
+      setIsAnimating(true);
+      audioChunksRef.current = []; // Clear previous chunks
+
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100
+        } 
+      });
+      
+      streamRef.current = stream;
+
+      mediaRecorderRef.current = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus',
+        audioBitsPerSecond: 128000
+      });
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'recording.webm');
+
+        try {
+          const response = await axios.post('http://localhost:5001/identify', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+            timeout: 30000,
+          });
+
+          if (response.data) {
+            setRecognizedMusic(response.data);
+            setShowModal(true);
+          }
+        } catch (err) {
+          console.error('Recognition error:', err.response?.data || err.message);
+          setError(err.response?.data?.message || 'Error recognizing audio. Please try again.');
+        } finally {
+          audioChunksRef.current = [];
+          setIsRecording(false);
+          setIsAnimating(false);
+          if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+          }
+        }
+      };
+
+      mediaRecorderRef.current.start(100); // Collect data every 100ms
+      setIsRecording(true);
+
+      // Record for 5 seconds
+      setTimeout(() => {
+        if (mediaRecorderRef.current?.state === 'recording') {
+          mediaRecorderRef.current.stop();
+        }
+      }, 5000);
+
+    } catch (err) {
+      console.error('Recording error:', err);
+      setError('Microphone access is required for this feature.');
+      setIsAnimating(false);
+    }
+  };
+
+
+  const stopRecordingAndSend = async () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+
+      mediaRecorderRef.current.onstop = async () => {
+        try {
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+
+          const formData = new FormData();
+          formData.append('audio', audioBlob);
+
+          const response = await axios.post('http://localhost:5001/identify', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+
+          setRecognizedMusic(response.data);
+          setShowModal(true);
+        } catch (err) {
+          setError('Error recognizing audio.');
+          console.error('Error recognizing audio:', err);
+        } finally {
+          // Clean up
+          audioChunksRef.current = [];
+          setIsRecording(false);
+          setIsAnimating(false);
+        }
+      };
+    }
   };
 
   const closeModal = () => {
     setShowModal(false);
-    setIsAnimating(false);
+    setRecognizedMusic(null);
   };
-
-  useEffect(() => {
-    let timer;
-    if (isAnimating) {
-      timer = setTimeout(() => {
-        setShowModal(true);
-        setIsAnimating(false);
-      }, 5000);
-    }
-
-    return () => clearTimeout(timer);
-  }, [isAnimating]);
 
   const circleVariants = {
     initial: {
@@ -81,7 +189,7 @@ const Animation = () => {
       }}
     >
       <motion.div
-        className='logo'
+        className="logo"
         style={{
           width: '150px',
           height: '150px',
@@ -91,34 +199,30 @@ const Animation = () => {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          position: 'relative',
           cursor: 'pointer',
           boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
         }}
         onClick={handleClick}
         variants={circleVariants}
-        initial='initial'
+        initial="initial"
         animate={isAnimating ? 'animate' : 'initial'}
       >
-        {/* Icon */}
         <svg
-          xmlns='http://www.w3.org/2000/svg'
-          viewBox='0 0 24 24'
-          fill='#ffffff'
-          width='50px'
-          height='50px'
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="#ffffff"
+          width="50px"
+          height="50px"
         >
-          <path d='M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 14 0h-2zM11 18h2v3h-2z' />
+          <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 14 0h-2zM11 18h2v3h-2z" />
         </svg>
-
-        {isAnimating && (
+        {isRecording && (
           <motion.p
             style={{
               color: '#ffffff',
               fontSize: '16px',
               marginTop: '12px',
               textAlign: 'center',
-              fontFamily: "'Arial', sans-serif",
               fontWeight: '525',
             }}
             initial={{ opacity: 0, y: 10 }}
@@ -133,7 +237,7 @@ const Animation = () => {
       <AnimatePresence>
         {showModal && (
           <motion.div
-            className='modal'
+            className="modal"
             style={{
               position: 'fixed',
               top: 0,
@@ -148,46 +252,42 @@ const Animation = () => {
               padding: '20px',
             }}
             variants={modalVariants}
-            initial='initial'
-            animate='animate'
-            exit='initial'
+            initial="initial"
+            animate="animate"
+            exit="exit"
           >
             <motion.div
-              className='modal-content'
+              className="modal-content"
               style={{
                 borderRadius: '10px',
                 color: 'white',
                 fontSize: '20px',
                 textAlign: 'center',
-                maxWidth: '90%',
-                minWidth: '300px',
                 padding: '20px',
                 fontFamily: "'Arial', sans-serif",
                 position: 'relative',
-                overflow: 'auto',
               }}
             >
-              {/* Close Button */}
               <button
                 onClick={closeModal}
                 style={{
                   position: 'absolute',
-                  top: '0px',
-                  right: '0px',
+                  top: '10px',
+                  right: '10px',
                   background: 'none',
                   border: 'none',
                   color: 'white',
                   fontSize: '24px',
                   cursor: 'pointer',
                 }}
-                aria-label='Close modal'
               >
                 &times;
               </button>
-
-              <div style={{ display: 'block', textAlign: 'center' }}>
-                <MusicFound />
-              </div>
+              {recognizedMusic ? (
+                <MusicFound music={recognizedMusic} />
+              ) : (
+                <p>{error || 'No music recognized.'}</p>
+              )}
             </motion.div>
           </motion.div>
         )}

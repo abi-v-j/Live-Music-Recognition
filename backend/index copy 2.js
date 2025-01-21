@@ -92,9 +92,8 @@ async function getSimilarSongs(recognizedTrack) {
     const artistName = recognizedTrack.artists[0]?.name;
     
     // Create search query based on genre and exclude the original artist
-    // const searchQuery = `genre:${genre} NOT artist:"${artistName}"`;
-    const searchQuery = `genre:${genre}`;
-
+    const searchQuery = `genre:${genre} NOT artist:"${artistName}"`;
+    
     // Get popular tracks matching the genre
     const result = await spotifyApi.searchTracks(searchQuery, {
       limit: 5,

@@ -1,7 +1,11 @@
 import React from 'react';
 import './MusicFound.scss';
 
-const MusicFound = () => {
+const MusicFound = ({ music }) => {
+  console.log(music);
+
+  const { recognized_song, similar_songs } = music
+
   return (
     <div className='music-player'>
       <div className='player-main'>
@@ -13,9 +17,12 @@ const MusicFound = () => {
             />
           </div>
           <div className='current-info'>
-            <h1>Blame</h1>
-            <p>KYLE</p>
-          </div>
+            <h1>{recognized_song?.title}</h1>
+            <p>
+              {recognized_song?.artists
+                ?.map((artist) => artist.name)
+                .join(', ')}
+            </p>          </div>
         </div>
         <div className='main-control'>
           <div className='btn _previous'></div>
@@ -29,6 +36,7 @@ const MusicFound = () => {
             <span className='end-time'>4:00</span>
           </div>
         </div>
+
         <div className='redirect-button'>
           <a
             href='https://spotify.com'
@@ -48,19 +56,24 @@ const MusicFound = () => {
           </a>
         </div>
       </div>
-      <ul className='player-list'>  
-        <li>
-          <img
-            className='list-cover'
-            src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/329679/music-player-freebie-a2.png'
-            alt='Sunset Lover'
-          />
-          <div className='list-info'>
-            <div className='info-title'>Sunset Lover</div>
-            <div className='info-artist'>PETIT BISCUIT</div>
-          </div>
-        </li>
-        <li>
+      <ul className='player-list'>
+        {
+          similar_songs && similar_songs.map((song,key) => (
+            <li>
+              <img
+                className='list-cover'
+                src={song.cover_image}
+                alt='Sunset Lover'
+              />
+              <div className='list-info'>
+                <div className='info-title'>{song.name}</div>
+                <div className='info-artist'>{song.artist}</div>
+              </div>
+            </li>
+          ))
+        }
+
+        {/* <li>
           <img
             className='list-cover'
             src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/329679/music-player-freebie-a3.png'
@@ -81,7 +94,7 @@ const MusicFound = () => {
             <div className='info-title'>Working Girl</div>
             <div className='info-artist'>LITTLE BOOTS</div>
           </div>
-        </li>
+        </li> */}
       </ul>
     </div>
   );
