@@ -109,7 +109,7 @@ const Animation = () => {
           const formData = new FormData();
           formData.append('audio', audioBlob);
 
-          const response = await axios.post('https://live-music-recognition-2pyx.vercel.app/identify', formData, {
+          const response = await axios.post('https://gemini.google.com/chat', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
