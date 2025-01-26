@@ -56,7 +56,7 @@ const Animation = () => {
         formData.append('audio', audioBlob, 'recording.webm');
 
         try {
-          const response = await axios.post('https://live-music-recognition-2pyx.vercel.app', formData, {
+          const response = await axios.post('http://localhost:5001/identify', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },

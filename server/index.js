@@ -178,6 +178,13 @@ app.post('/identify', upload.single('audio'), async (req, res) => {
   }
 });
 
+
+app.get("/test",(req,res)=> {
+res.send({
+  msg:"Hello Abi"
+})
+})
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
