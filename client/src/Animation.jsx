@@ -98,37 +98,6 @@ const Animation = () => {
   };
 
 
-  const stopRecordingAndSend = async () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-
-      mediaRecorderRef.current.onstop = async () => {
-        try {
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-
-          const formData = new FormData();
-          formData.append('audio', audioBlob);
-
-          const response = await axios.post('https://live-music-recognition-2pyx.vercel.app/identify', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
-
-          setRecognizedMusic(response.data);
-          setShowModal(true);
-        } catch (err) {
-          setError('Error recognizing audio.');
-          console.error('Error recognizing audio:', err);
-        } finally {
-          // Clean up
-          audioChunksRef.current = [];
-          setIsRecording(false);
-          setIsAnimating(false);
-        }
-      };
-    }
-  };
 
   const closeModal = () => {
     setShowModal(false);
